@@ -37,6 +37,8 @@
 float learning_rate;
 #define TESTING_LENGTH 10000
 
+#define TMAX 100000000
+
 extern size_t strlcpy(char *dst, const char *src, size_t size);
 
 // ----------------------------------------------------------------------------
@@ -552,7 +554,7 @@ int main(int argc, char *argv[]) {
     Model m;
     build_Model(&m);
     
-    for (int t = 0; t < 100000000; t++) {
+    for (int t = 0; t < TMAX; t++) {
 
         load_snippet(&m, &training, get_random_training_index(&training));
         learning_rate = LEARNING_RATE; // Adam scheduler
@@ -560,10 +562,11 @@ int main(int argc, char *argv[]) {
     
         if (t % 10000 == 0) {
 
-            printf("...validating... "); fflush(stdout);
             float validation_loss = 0;
             
             for (int i = 0; i < TESTING_LENGTH; i++) {                
+                printf("validating %d%%\r", (int)((float)i/TESTING_LENGTH * 100));
+                fflush(stdout);
                 load_snippet(&m, &training, training.testing_input_data[i]);
                 model_forward(&m);
                 softmax(m.output[CONTEXT_SIZE-1], VOCAB_SIZE, 1.0f);
@@ -579,7 +582,8 @@ int main(int argc, char *argv[]) {
             model_prompt_response(&m, (unsigned char*)"insert your validation prompt here ", 80);
             printf("\n"); 
         }
-        printf("\rt=%d", t); fflush(stdout);
+        printf("\rt=%d / %d", t, TMAX);
+        fflush(stdout);
     }
     
     free_Model(&m);
