@@ -13,6 +13,7 @@
 #include <unistd.h>
 #include <sys/mman.h>
 
+
 #define FILE_NAME "loss.csv"    // saves validation loss values during training
 
 #define CONTEXT_SIZE            32
@@ -36,6 +37,7 @@
 float learning_rate;
 #define TESTING_LENGTH 10000
 
+extern size_t strlcpy(char *dst, const char *src, size_t size);
 
 // ----------------------------------------------------------------------------
 // Spiking model
